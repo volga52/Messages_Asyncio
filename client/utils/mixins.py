@@ -1,5 +1,4 @@
 from json import dumps, loads
-# import json
 from client.database.db_controller import ClientMessages
 from client.database.models import Base
 from client.client_config import ENCODING

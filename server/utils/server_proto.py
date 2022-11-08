@@ -56,6 +56,8 @@ class ChatServerProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
             return False
 
     def data_received(self, data: bytes) -> None:
+        """The protocol expects a json message in bytes"""
+
         _data = self._bytes_to_dict(data)
         print(_data)
 
@@ -64,6 +66,7 @@ class ChatServerProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
                 if _data['action'] == 'presence':  # received presence msg
                     if _data['user']['account_name']:
 
+                        print(self.user, _data['user']['status'])
                         resp_msg = self.jim.response(code=200)
                         self.transport.write(self._dict_to_bytes(resp_msg))
                     else:
@@ -73,16 +76,21 @@ class ChatServerProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
                 elif _data['action'] == 'authenticate':
                     if self.authenticate(_data['user']['account_name'],
                                          _data['user']['password']):
+
                         # Добавляем нового пользователя во временную переменную
                         if _data['user']['account_name'] not in self.users:
+                            # print(f'self.users - {self.users}')
                             self.user = _data['user']['account_name']
 
+                            # print(f'self.user - {self.user}')
                             self.connections[self.transport][
                                 'username'] = self.user
 
+                            # print(f'self.connections - {self.connections}')
                             self.users[_data['user']['account_name']] = \
-                                self.connections(self.transport)
+                                self.connections[self.transport]
 
+                            # print(f'self.users - {self.users}')
                             self.set_user_online(_data['user']['account_name'])
 
                         resp_msg = self.jim.probe(self.user)
@@ -93,6 +101,7 @@ class ChatServerProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
                                                      error='wrong login/password')
                         self.transport.write(self._dict_to_bytes(resp_msg))
                 else:
+                    print(f"Другой ответ {_data['action']}")
                     pass
             except Exception as er:
                 resp_msg = self.jim.response(code=500, error=er)

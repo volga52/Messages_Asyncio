@@ -12,7 +12,7 @@ class JimClientMessage:
         data = {
             'action': 'authenticate',
             'time': datetime.now().timestamp(),
-            'type': 'status',
+            # 'type': 'status',
             'user': {
                 'account_name': username,
                 'password': password
@@ -20,14 +20,14 @@ class JimClientMessage:
         }
         return data
 
-    def response(self, code=None, error=None):
-        _data = {
-            'action': 'response',
-            'code': code,
-            'time': datetime.now(),
-            'error': error
-        }
-        return _data
+    # def response(self, code=None, error=None):
+    #     _data = {
+    #         'action': 'response',
+    #         'code': code,
+    #         'time': datetime.now(),
+    #         'error': error
+    #     }
+    #     return _data
 
     def presence(self, sender, status="Yep, I am here!"):
         """

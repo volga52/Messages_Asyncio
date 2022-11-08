@@ -1,5 +1,5 @@
 from json import dumps, loads
-# import json
+
 from server.database.db_controller import ClientMessages
 from server.database.models import Base
 from server.server_config import ENCODING
@@ -33,6 +33,7 @@ class ConvertMixin:
             # Преобразуем словарь в json строку
             # json_message = dumps(messages_dict, indent=4, sort_keys=True, default=str)
             json_message = dumps(messages_dict, default=str)
+            # json_message = dumps(messages_dict)
             # Преобразуем json строки в байты
             byte_message = json_message.encode(ENCODING)
             return byte_message

@@ -8,6 +8,8 @@ from client.utils.client_messages import JimClientMessage
 
 
 class ClientAuth(ConvertMixin, DbInterfaceMixin):
+    """Authentication server"""
+
     def __init__(self, db_path, username=None, password=None):
         super().__init__(db_path)
         self.username = username
@@ -59,7 +61,11 @@ class ChartClientProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
     def connection_made(self, transport) -> None:
         """Called when connection is initiated"""
         self.socket_name = transport.get_extra_info("sockname")
+        print(f"1 - {self.socket_name}")
+
         self.transport = transport
+        print(f"2 - {self.transport}")
+
         self.send_auth(self.user, self.password)
         self.conn_is_open = True
 
@@ -80,9 +86,8 @@ class ChartClientProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
             try:
                 if message['action'] == 'probe':
                     self.transport.write(self._dict_to_bytes(
-                        self.jim.presence(self.user,
-                                          status="Connected from {0} {1}").format(*self.socket_name)))
-                elif message['action'] == 'responce':
+                        self.jim.presence(self.user, status="Connected from {0} {1}".format(*self.socket_name))))
+                elif message['action'] == 'response':
                     if message['code'] == 200:
                         pass
                     elif message['code'] == 402:
@@ -96,12 +101,15 @@ class ChartClientProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
         while not self.conn_is_open:
             pass
         self.output = self.output_to_console
-        self.output(
-            "{2} connected to {0}:{1}\n".format(*self.socket_name, self.user))
+        self.output("{2} connected to {0}:{1}\n".format(*self.socket_name, self.user))
 
         while True:
             content = await self.loop.run_in_executor(None, input)
+            # print(content)
+            print(f"3 - {content}")
+
 
     def output_to_console(self, data):
         _data = data
+        print(f"4 - {_data}")
         stdout.write(_data)
