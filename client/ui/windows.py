@@ -9,10 +9,38 @@ from client.ui.contacts_ui import Ui_ContactsWindow as contacts_ui_class
 class LoginWindow(QtWidgets.QDialog):
     """Login window (user interface)"""
 
-    def __init__(self, parent=None):
+    def __init__(self, auth_instance=None, parent=None):
         super().__init__(parent)
+
+        self.username = None
+        self.password = None
+        self.auth_instance = auth_instance
+
         self.ui = login_ui_class()
         self.ui.setupUi(self)
+
+    def on_login_btn_pressed(self):
+        """
+        Функция обрабатывает нажатие кнопки получения вводимых логина и пароля
+        :return: None
+        """
+        # Получение из форм логина и пароля
+        self.username = self.ui.username_text.text()
+        self.password = self.ui.password_text.text()
+        # Передаем во внутренние параметры
+        self.auth_instance.username = self.username
+        self.auth_instance.password = self.password
+        # Проверяем полученные элементы по таблице
+        is_auth = self.auth_instance.authenticate()
+        if is_auth:
+            self.accept()
+            print(f'{self.username} logged in')
+        else:
+            self.ui.username_text.clear()
+            self.ui.password_text.clear()
+            QtWidgets.QMessageBox.warning(self,
+                                          'Error',
+                                          'Bad user or password')
 
 
 class ContactWindow(QtWidgets.QMainWindow):
