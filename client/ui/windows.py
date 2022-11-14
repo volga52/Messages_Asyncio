@@ -21,7 +21,7 @@ class LoginWindow(QtWidgets.QDialog):
 
     def on_login_btn_pressed(self):
         """
-        Функция обрабатывает нажатие кнопки получения вводимых логина и пароля
+        Функция обрабатывает ввод логина и пароля
         :return: None
         """
         # Получение из форм логина и пароля
@@ -38,8 +38,7 @@ class LoginWindow(QtWidgets.QDialog):
         else:
             self.ui.username_text.clear()
             self.ui.password_text.clear()
-            QtWidgets.QMessageBox.warning(self,
-                                          'Error',
+            QtWidgets.QMessageBox.warning(self, 'Error',
                                           'Bad user or password')
 
 
