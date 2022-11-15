@@ -80,11 +80,51 @@ class GuiClientApp:
         set_event_loop(loop)
 
         # authentication process
-        login_window = LoginWindow()
+        auth_ = ClientAuth(db_path=self.db_path)
+        login_window = LoginWindow(auth_instance=auth_)
 
         # Отлов подтверждения
         if login_window.exec_() == QtWidgets.QDialog.Accepted:
-            pass
+            # Each client will create a new protocol instance
+            client_ = ChartClientProtocol(db_path=self.db_path,
+                                          loop=loop,
+                                          username=login_window.username,
+                                          password=login_window.password)
+            # Create Contacts window
+            window = ContactWindow(client_instance=client_,
+                                   user_name=login_window.username)
+            # reference from protocol to GUI, for msg update
+            # ссылка из протокола на графический интерфейс пользователя
+            # для обновления msg
+            client_.gui_instance = window
+
+            with loop:
+                # cleaning old instances
+                del auth_
+                del login_window
+
+                # connect to our server
+                try:
+                    coro = loop.create_connection(lambda: client_,
+                                                  self.args['addr'],
+                                                  self.args['port'])
+                    server = loop.run_until_complete(coro)
+                except ConnectionRefusedError:
+                    print('Error. wrong server')
+                    exit(1)
+
+                # start GUI client
+                window.show()
+                # asyncio.ensure_future(client_.get_from_gui(loop))
+                # client_.get_from_gui()
+
+                # server requests until Ctrl+C
+                try:
+                    loop.run_until_forever()
+                except KeyboardInterrupt:
+                    pass
+                except Exception:
+                    pass
 
 
 def parse_and_run():

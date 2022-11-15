@@ -31,8 +31,7 @@ class ClientAuth(ConvertMixin, DbInterfaceMixin):
                     # add client's history row
                     self.add_client_history(self.username)
                     return True
-                else:
-                    return False
+                return False
             else:
                 # new user
                 print('new user')
@@ -45,12 +44,14 @@ class ClientAuth(ConvertMixin, DbInterfaceMixin):
 
 
 class ChartClientProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
-    def __init__(self, db_path, loop, username=None, password=None,
+    def __init__(self, db_path, loop, tasks=None, username=None, password=None,
                  gui_instance=None, **kwargs):
         super().__init__(db_path)
         self.user = username
         self.password = password
         self.jim = JimClientMessage()
+        self.gui_instance = gui_instance
+        self.tasks = tasks
 
         self.conn_is_open = False
         self.loop = loop
@@ -101,7 +102,8 @@ class ChartClientProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
         while not self.conn_is_open:
             pass
         self.output = self.output_to_console
-        self.output("{2} connected to {0}:{1}\n".format(*self.socket_name, self.user))
+        self.output("{2} connected to {0}:{1}\n".format(
+            *self.socket_name, self.user))
 
         while True:
             content = await self.loop.run_in_executor(None, input)

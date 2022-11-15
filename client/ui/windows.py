@@ -1,4 +1,4 @@
-import time
+# import time
 from PyQt5 import QtCore, QtWidgets
 
 from client.ui.login_ui import Ui_Login_Dialog as login_ui_class
@@ -45,7 +45,11 @@ class LoginWindow(QtWidgets.QDialog):
 class ContactWindow(QtWidgets.QMainWindow):
     """Contacts window (user interface)"""
 
-    def __init__(self, parent=None):
+    def __init__(self, client_instance, user_name=None, parent=None):
         super().__init__(parent)
+        self.client_instance = client_instance
+        self.user_name = user_name
+        self.chat_ins = None
+
         self.ui = contacts_ui_class()
         self.ui.setupUi(self)
