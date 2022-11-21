@@ -73,7 +73,8 @@ class GuiServerApp:
         loop = QEventLoop(app)
         # New must set the event loop
         set_event_loop(loop)
-        wind = ServerMonitorWindow()
+        wind = ServerMonitorWindow(server_instance=self.ins,
+                                   parsed_args=self.args)
         wind.show()
 
         with loop:
