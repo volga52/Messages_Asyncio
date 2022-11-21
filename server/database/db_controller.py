@@ -55,7 +55,7 @@ class ClientMessages:
 
     def add_contact(self, client_username, contact_username):
         """Добавление контакта"""
-        contact = self.get_client_by_username((contact_username))
+        contact = self.get_client_by_username(contact_username)
         if contact:
             client = self.get_client_by_username(client_username)
             if client:

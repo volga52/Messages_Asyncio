@@ -1,9 +1,13 @@
 from argparse import ArgumentParser
 from asyncio import ensure_future, get_event_loop, run, create_task, \
     set_event_loop
-from sys import argv as sysargv
+from sys import argv
+from sys import exit as sys_exit
 
 from PyQt5 import Qt, QtWidgets
+# from PyQt5.QtWidgets import QApplication, QDialog
+# from PyQt5 import QtWidgets
+
 from quamash import QEventLoop
 
 from client.ui.windows import LoginWindow
@@ -49,7 +53,8 @@ class ConsoleClientApp:
             transport, protocol = loop.run_until_complete(coro)
         except ConnectionRefusedError:
             print('Error. wrong server')
-            exit(1)
+            sys_exit(1)
+            # exit(1)
 
         try:
             task = loop.create_task(_client.get_from_console())
@@ -74,7 +79,9 @@ class GuiClientApp:
     def main(self):
         """Основная функция запуска GUI client"""
         # create event loop
-        app = Qt.QApplication(sysargv)
+        # app = Qt.QApplication(sysargv)
+        app = Qt.QApplication(argv)
+        # app = QtWidgets.QApplication(argv)
         loop = QEventLoop(app)
         # New must set the event loop
         set_event_loop(loop)
@@ -84,6 +91,8 @@ class GuiClientApp:
         login_window = LoginWindow(auth_instance=auth_)
 
         # Отлов подтверждения
+        # if login_window.exec_() == QtWidgets.QDialog.Accepted:
+        # if login_window.exec_() == QDialog.Accepted:
         if login_window.exec_() == QtWidgets.QDialog.Accepted:
             # Each client will create a new protocol instance
             client_ = ChartClientProtocol(db_path=self.db_path,

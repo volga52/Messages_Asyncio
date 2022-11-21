@@ -2,7 +2,7 @@
 from PyQt5 import QtCore, QtWidgets
 
 from client.ui.login_ui import Ui_Login_Dialog as login_ui_class
-from client.ui.chat_ui import Ui_ChatMainWindow as chat_ui_class
+# from client.ui.chat_ui import Ui_ChatMainWindow as chat_ui_class
 from client.ui.contacts_ui import Ui_ContactsWindow as contacts_ui_class
 
 
@@ -47,6 +47,7 @@ class ContactWindow(QtWidgets.QMainWindow):
 
     def __init__(self, client_instance, user_name=None, parent=None):
         super().__init__(parent)
+
         self.client_instance = client_instance
         self.user_name = user_name
         self.chat_ins = None
