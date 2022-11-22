@@ -5,14 +5,11 @@ from sys import argv
 from sys import exit as sys_exit
 
 from PyQt5 import Qt, QtWidgets
-# from PyQt5.QtWidgets import QApplication, QDialog
 # from PyQt5 import QtWidgets
 
 from quamash import QEventLoop
 
-from client.ui.windows import LoginWindow
-from client.ui.windows import ContactWindow
-# from client.ui.windows import
+from client.ui.windows import LoginWindow, ContactsWindow
 from client.utils.client_proto import ChartClientProtocol, ClientAuth
 from client.client_config import DB_PATH, PORT
 
@@ -51,6 +48,7 @@ class ConsoleClientApp:
             coro = loop.create_connection(lambda: _client, self.args["addr"],
                                           self.args["port"])
             transport, protocol = loop.run_until_complete(coro)
+
         except ConnectionRefusedError:
             print('Error. wrong server')
             sys_exit(1)
@@ -79,9 +77,8 @@ class GuiClientApp:
     def main(self):
         """Основная функция запуска GUI client"""
         # create event loop
-        # app = Qt.QApplication(sysargv)
-        app = Qt.QApplication(argv)
-        # app = QtWidgets.QApplication(argv)
+        # app = Qt.QApplication(argv)
+        app = QtWidgets.QApplication(argv)
         loop = QEventLoop(app)
         # New must set the event loop
         set_event_loop(loop)
@@ -100,8 +97,8 @@ class GuiClientApp:
                                           username=login_window.username,
                                           password=login_window.password)
             # Create Contacts window
-            window = ContactWindow(client_instance=client_,
-                                   user_name=login_window.username)
+            window = ContactsWindow(client_instance=client_,
+                                    user_name=login_window.username)
             # reference from protocol to GUI, for msg update
             # ссылка из протокола на графический интерфейс пользователя
             # для обновления msg
@@ -129,7 +126,7 @@ class GuiClientApp:
 
                 # server requests until Ctrl+C
                 try:
-                    loop.run_until_forever()
+                    loop.run_forever()
                 except KeyboardInterrupt:
                     pass
                 except Exception:
