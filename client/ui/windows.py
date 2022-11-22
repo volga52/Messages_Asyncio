@@ -126,4 +126,55 @@ class ChatWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.parent_window = parent
 
-        # self.after_start()
+        self.after_start()
+
+    def after_start(self):
+        """Обновление параметров после старта"""
+        self.contact_username = \
+            self.parent_window.ui.all_contacts.currentItem().text()
+
+        self.username = self.parent_window.username
+        self.client_instance = self.parent_window.client_instance
+        self.parent_window.chat_ins = self.update_chat
+        self.update_chat()
+
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_Enter:
+            self.on_send_btn_pressed()
+            event.accept()
+        elif event.key() == QtCore.Qt.Key_Escape:
+            self.close()
+        else:
+            event.ignore()
+
+    def update_chat(self, quantity=20):
+        """Обновление чата - получение всего общения с пользователем (20)"""
+        self.ui.chat_window.clear()
+        client_msgs = [c for c in
+                       self.client_instance.get_client_messages(self.username)
+                       if c.contact.username == self.contact_username]
+        contact_msgs = [c for c in
+                        self.client_instance.get_client_messages(
+                            self.contact_username)
+                        if c.contact.username == self.username]
+        msgs = sorted(client_msgs + contact_msgs, key=lambda x: x.time)
+
+        for msg in msgs[-quantity:]:
+            sender = msg.client.username
+            if msg.client.username == self.username:
+                sender = 'me'
+
+            self.ui.chat_window.addItem(
+                '{} from {}: {}'.format(msg.time.strftime("%Y-%m-%d %H:%M:%S"),
+                                        sender,
+                                        msg.message))
+
+    def on_send_btn_pressed(self):
+        msg = self.ui.send_text.text()
+
+        if msg:
+            self.client_instance.send_msg(to_user=self.contact_username,
+                                          content=msg)
+            time.sleep(0.1)
+            self.update_chat()
+            self.ui.send_text.clear()
