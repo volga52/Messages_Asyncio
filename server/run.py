@@ -1,7 +1,8 @@
 from argparse import ArgumentParser
 from asyncio import get_event_loop, set_event_loop
 
-from PyQt5 import Qt
+from PyQt5 import Qt, QtWidgets
+from PyQt5.QtWidgets import QApplication
 from sys import argv
 from quamash import QEventLoop
 
@@ -67,11 +68,13 @@ class GuiServerApp:
         self.ins = ChatServerProtocol(self.db_path, connections, users)
 
         # GUI
-        app = Qt.QApplication(argv)
+        # app = Qt.QApplication(argv)
+        app = QApplication(argv)
         loop = QEventLoop(app)
         # New must set the event loop
         set_event_loop(loop)
-        wind = ServerMonitorWindow()
+        wind = ServerMonitorWindow(server_instance=self.ins,
+                                   parsed_args=self.args)
         wind.show()
 
         with loop:

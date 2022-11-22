@@ -79,30 +79,29 @@ class ChatServerProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
 
                         # Добавляем нового пользователя во временную переменную
                         if _data['user']['account_name'] not in self.users:
-                            # print(f'self.users - {self.users}')
+                            print(f'self.users - {self.users}')
                             self.user = _data['user']['account_name']
 
-                            # print(f'self.user - {self.user}')
+                            print(f'self.user - {self.user}')
                             self.connections[self.transport][
                                 'username'] = self.user
 
-                            # print(f'self.connections - {self.connections}')
+                            print(f'self.connections - {self.connections}')
                             self.users[_data['user']['account_name']] = \
                                 self.connections[self.transport]
 
-                            # print(f'self.users - {self.users}')
+                            print(f'self.users - {self.users}')
                             self.set_user_online(_data['user']['account_name'])
 
                         resp_msg = self.jim.probe(self.user)
-                        self.users[_data['user']['account_name']][
-                            'transport'].write(self._dict_to_bytes(resp_msg))
+                        self.users[_data['user']['account_name']]['transport'].write(self._dict_to_bytes(resp_msg))
                     else:
                         resp_msg = self.jim.response(code=402,
                                                      error='wrong login/password')
                         self.transport.write(self._dict_to_bytes(resp_msg))
-                else:
-                    print(f"Другой ответ {_data['action']}")
-                    pass
+                # else:
+                #     print(f"Другой ответ {_data['action']}")
+                #     pass
             except Exception as er:
                 resp_msg = self.jim.response(code=500, error=er)
                 self.transport.write(self._dict_to_bytes(resp_msg))

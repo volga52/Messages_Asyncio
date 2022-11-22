@@ -43,7 +43,7 @@ class ClientMessages:
                 print(f'Добавлена запись в историю: {new_history}')
             except IntegrityError as err:
                 # print('Ошибка интеграции с базой данных: {}'.format(err))
-                print(f'Ошибка интеграции с базой данных')
+                print(f'Ошибка интеграции с базой данных {err}')
                 self.dal.session.rollback()
         else:
             # return 'Пользователь {} не существует'.format(client_username)
@@ -62,7 +62,7 @@ class ClientMessages:
 
     def add_contact(self, client_username, contact_username):
         """Добавление контакта"""
-        contact = self.get_client_by_username((contact_username))
+        contact = self.get_client_by_username(contact_username)
         if contact:
             client = self.get_client_by_username(client_username)
             if client:

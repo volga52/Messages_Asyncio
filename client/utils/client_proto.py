@@ -55,14 +55,14 @@ class ChartClientProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
 
         self.conn_is_open = False
         self.loop = loop
-        self.socket_name = None
+        self.sockname = None
         self.transport = None
         self.output = None
 
     def connection_made(self, transport) -> None:
         """Called when connection is initiated"""
-        self.socket_name = transport.get_extra_info("sockname")
-        print(f"1 - {self.socket_name}")
+        self.sockname = transport.get_extra_info("sockname")
+        print(f"1 - {self.sockname}")
 
         self.transport = transport
         print(f"2 - {self.transport}")
@@ -87,7 +87,9 @@ class ChartClientProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
             try:
                 if message['action'] == 'probe':
                     self.transport.write(self._dict_to_bytes(
-                        self.jim.presence(self.user, status="Connected from {0} {1}".format(*self.socket_name))))
+                        self.jim.presence(self.user,
+                                          status="Connected from {0} {1}".format(
+                                              *self.sockname))))
                 elif message['action'] == 'response':
                     if message['code'] == 200:
                         pass
@@ -103,15 +105,13 @@ class ChartClientProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
             pass
         self.output = self.output_to_console
         self.output("{2} connected to {0}:{1}\n".format(
-            *self.socket_name, self.user))
+            *self.sockname, self.user))
 
         while True:
             content = await self.loop.run_in_executor(None, input)
             # print(content)
             print(f"3 - {content}")
 
-
     def output_to_console(self, data):
         _data = data
-        print(f"4 - {_data}")
         stdout.write(_data)
