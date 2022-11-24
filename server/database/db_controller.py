@@ -149,7 +149,8 @@ class ClientMessages:
             except IntegrityError as error:
                 print(f'IntegrityError error: {error}')
                 self.dal.session.commit()
-        return f'Client {client_username} ' \
+        else:
+            return f'Client {client_username} ' \
                f"or {contact_username} don't exists"
 
     def get_client_messages(self, client_username):
