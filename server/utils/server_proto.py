@@ -125,13 +125,17 @@ class ChatServerProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
                 print(data)
 
                 # save msg to DB history messages
-                self._cm.add_client_message(data['from'], data['to'], data['message'])
+                self._cm.add_client_message(
+                    data['from'], data['to'], data['message'])
 
-                self.users[data['from']]['transport'].write(self._dict_to_bytes(data))
+                self.users[data['from']]['transport']\
+                    .write(self._dict_to_bytes(data))
 
-            if data['to'] and data['from'] != data['to']:  # send msg to receiver's chat
+            # send msg to receiver's chat
+            if data['to'] and data['from'] != data['to']:
                 try:
-                    self.users[data['to']]['transport'].write(self._dict_to_bytes(data))
+                    self.users[data['to']]['transport']\
+                        .write(self._dict_to_bytes(data))
                 except KeyError:
                     # resp_msg = self.jim.response(code=404, error='user is not connected')
                     # self.users[data['from']]['transport'].write(self._dict_to_bytes(resp_msg))
