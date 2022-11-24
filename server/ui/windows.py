@@ -43,3 +43,26 @@ class ServerMonitorWindow(QMainWindow):
 
         print('refresh')
         self.update_clients()
+
+    def update_history_messages(self, username):
+        """
+        Get all events from client's history.
+        :param username: имя пользователя
+        :return: None
+        """
+
+        self.ui.msg_history_list.clear()
+        messages = self.server_instance.get_client_history(username)
+        _resp = [m.time.strftime("%Y-%m-%d %H:%M:%S") + '_' + m.ip_address
+                 + '_' + m.client.username for m in messages]
+        self.ui.msg_history_list.addItems(_resp)
+
+    def on_clients_list_itemDoubleClicked(self):
+        """
+        Event, when double clicked on user in client's list
+        -> update history and go to history tab
+        """
+        selected_client = self.ui.clients_list.currentItem().text()
+        self.update_history_messages(selected_client)
+        # set history tab active
+        self.ui.tabWidgetClients.setCurrentIndex(1)
