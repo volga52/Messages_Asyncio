@@ -163,24 +163,25 @@ class ChatServerProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
                         resp_msg = self.jim.response(
                             code=500, error='wrong presence msg')
                         self.transport.write(self._dict_to_bytes(resp_msg))
+
                 elif _data['action'] == 'authenticate':
                     if self.authenticate(_data['user']['account_name'],
                                          _data['user']['password']):
 
                         # Добавляем нового пользователя во временную переменную
                         if _data['user']['account_name'] not in self.users:
-                            print(f'self.users - {self.users}')
+                            # print(f'self.users - {self.users}')
                             self.user = _data['user']['account_name']
 
-                            print(f'self.user - {self.user}')
+                            # print(f'self.user - {self.user}')
                             self.connections[self.transport][
                                 'username'] = self.user
 
-                            print(f'self.connections - {self.connections}')
+                            # print(f'self.connections - {self.connections}')
                             self.users[_data['user']['account_name']] = \
                                 self.connections[self.transport]
 
-                            print(f'self.users - {self.users}')
+                            # print(f'self.users - {self.users}')
                             self.set_user_online(_data['user']['account_name'])
 
                         resp_msg = self.jim.probe(self.user)
@@ -189,9 +190,16 @@ class ChatServerProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
                         resp_msg = self.jim.response(code=402,
                                                      error='wrong login/password')
                         self.transport.write(self._dict_to_bytes(resp_msg))
-                elif _data['action'] == 'msg':
+
+                # elif _data['action'] == 'msg':
+                elif _data['action'] == 'message':
                     self.user = _data['from']
                     self.action_msg(_data)
+
+                elif _data['action'] == 'list':
+                    self.user = _data['user']['account_name']
+                    self.action_list(_data)
+
             except Exception as er:
                 resp_msg = self.jim.response(code=500, error=er)
                 self.transport.write(self._dict_to_bytes(resp_msg))

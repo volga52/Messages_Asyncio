@@ -111,6 +111,11 @@ class ChartClientProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
                         self.connection_lost(CancelledError)
                     else:
                         self.output(message)
+
+                # elif message['action'] == 'msg':
+                elif message['action'] == 'message':
+                    self.output(message)
+
             except Exception as exc:
                 print(exc)
 
@@ -142,3 +147,17 @@ class ChartClientProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
             request = self.jim.message(self.user, to_user, content)
             self.transport.write(self._dict_to_bytes(request))
 
+    def get_from_gui(self):
+        self.output = self.output_to_gui
+
+    def output_to_gui(self, msg, response=False):
+        try:
+            if self.gui_instance:
+                if response:
+                    self.gui_instance.is_auth = True
+
+                if self.user == msg['to']:
+                    self.gui_instance.chat_ins()
+
+        except Exception as e:
+            print(e)

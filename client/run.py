@@ -88,8 +88,6 @@ class GuiClientApp:
         login_window = LoginWindow(auth_instance=auth_)
 
         # Отлов подтверждения
-        # if login_window.exec_() == QtWidgets.QDialog.Accepted:
-        # if login_window.exec_() == QDialog.Accepted:
         if login_window.exec_() == QtWidgets.QDialog.Accepted:
             # Each client will create a new protocol instance
             client_ = ChartClientProtocol(db_path=self.db_path,
@@ -122,7 +120,8 @@ class GuiClientApp:
                 # start GUI client
                 window.show()
                 # asyncio.ensure_future(client_.get_from_gui(loop))
-                # client_.get_from_gui()
+                # добавление истории
+                client_.get_from_gui()
 
                 # server requests until Ctrl+C
                 try:
