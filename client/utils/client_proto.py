@@ -157,6 +157,11 @@ class ChartClientProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
                     self.gui_instance.is_auth = True
 
                 if self.user == msg['to']:
+                    self.gui_instance.client_instance.add_client_message(
+                        client_username=msg['to'],      # кому
+                        contact_username=msg['from'],   # от кого
+                        text_msg=msg['message']
+                    )
                     self.gui_instance.chat_ins()
 
         except Exception as e:
