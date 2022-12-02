@@ -153,14 +153,11 @@ class ChatWindow(QtWidgets.QMainWindow):
         client_msgs = [c for c in
                        self.client_instance.get_client_messages(self.username)
                        if c.contact.username == self.contact_username]
-        print("Запрос на свои сообщения +")
         contact_msgs = [c for c in
                         self.client_instance.get_client_messages(
                             self.contact_username)
                         if c.contact.username == self.username]
-        print("Запрос на твои сообщения +")
         msgs = sorted(client_msgs + contact_msgs, key=lambda x: x.time)
-        print("Общий список +")
 
         for msg in msgs[-quantity:]:
             sender = msg.client.username

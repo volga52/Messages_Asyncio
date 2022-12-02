@@ -89,6 +89,7 @@ class GuiClientApp:
 
         # Отлов подтверждения
         if login_window.exec_() == QtWidgets.QDialog.Accepted:
+            # Здесь можно вмешаться и изменить имя self.db_path
             # Each client will create a new protocol instance
             client_ = ChartClientProtocol(db_path=self.db_path,
                                           loop=loop,

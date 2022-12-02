@@ -146,6 +146,12 @@ class ChartClientProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
         if to_user and content:
             request = self.jim.message(self.user, to_user, content)
             self.transport.write(self._dict_to_bytes(request))
+            # Запись в БД отправляемого сообщение
+            self.gui_instance.client_instance.add_client_message(
+                client_username=self.user,  # от кого
+                contact_username=to_user,   # кому
+                text_msg=content
+            )
 
     def get_from_gui(self):
         self.output = self.output_to_gui
@@ -157,9 +163,10 @@ class ChartClientProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
                     self.gui_instance.is_auth = True
 
                 if self.user == msg['to']:
+                    # Запись в БД пришедшее сообщение
                     self.gui_instance.client_instance.add_client_message(
-                        client_username=msg['to'],      # кому
-                        contact_username=msg['from'],   # от кого
+                        client_username=msg['from'],    # от кого
+                        contact_username=msg['to'],     # кому
                         text_msg=msg['message']
                     )
                     self.gui_instance.chat_ins()

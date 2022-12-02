@@ -122,7 +122,7 @@ class ChatServerProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
         """
         try:
             if data['from']:  # send msg to sender's chat
-                print(data)
+                print('action_msg: OK', data)
 
                 # save msg to DB history messages
                 self._cm.add_client_message(
@@ -133,9 +133,11 @@ class ChatServerProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
 
             # send msg to receiver's chat
             if data['to'] and data['from'] != data['to']:
+                print(f"Отправка в чат {data['to']} от {data['from']}")
                 try:
                     self.users[data['to']]['transport']\
                         .write(self._dict_to_bytes(data))
+                    print('отправка: OK')
                 except KeyError:
                     # resp_msg = self.jim.response(code=404, error='user is not connected')
                     # self.users[data['from']]['transport'].write(self._dict_to_bytes(resp_msg))
@@ -144,6 +146,12 @@ class ChatServerProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
         except Exception as e:
             resp_msg = self.jim.response(code=500, error=e)
             self.transport.write(self._dict_to_bytes(resp_msg))
+
+    def action_list(self, data):
+        client = self.get_client_by_username(data['user']['account_name'])
+        if client:
+            return self._cm.get_client_messages(client)
+            # return self.get_client_messages(client)
 
     def data_received(self, data: bytes) -> None:
         """The protocol expects a json message in bytes"""
@@ -168,27 +176,26 @@ class ChatServerProtocol(Protocol, ConvertMixin, DbInterfaceMixin):
                     if self.authenticate(_data['user']['account_name'],
                                          _data['user']['password']):
 
-                        # Добавляем нового пользователя во временную переменную
+                        # Добавление нового пользователя (временную переменную)
                         if _data['user']['account_name'] not in self.users:
-                            # print(f'self.users - {self.users}')
                             self.user = _data['user']['account_name']
 
-                            # print(f'self.user - {self.user}')
                             self.connections[self.transport][
                                 'username'] = self.user
 
-                            # print(f'self.connections - {self.connections}')
                             self.users[_data['user']['account_name']] = \
                                 self.connections[self.transport]
 
-                            # print(f'self.users - {self.users}')
                             self.set_user_online(_data['user']['account_name'])
 
                         resp_msg = self.jim.probe(self.user)
-                        self.users[_data['user']['account_name']]['transport'].write(self._dict_to_bytes(resp_msg))
+                        self.users[_data['user']['account_name']]['transport']\
+                            .write(self._dict_to_bytes(resp_msg))
                     else:
-                        resp_msg = self.jim.response(code=402,
-                                                     error='wrong login/password')
+                        resp_msg = self.jim.response(
+                            code=402,
+                            error='wrong login/password'
+                        )
                         self.transport.write(self._dict_to_bytes(resp_msg))
 
                 # elif _data['action'] == 'msg':
